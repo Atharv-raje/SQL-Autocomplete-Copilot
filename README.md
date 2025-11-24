@@ -46,7 +46,7 @@ Question
 How many active users logged in during the last 7 days?
 ```
 
-## 🚀 Features
+##  Features
 ✔ Natural Language → SQL Conversion
 
 Ask questions like:
@@ -64,7 +64,7 @@ Multiple SQL query suggestions
 Clear human-friendly descriptions
 
 ##  Full Stack 
-## Frontend:
+ Frontend:
 
 Next.js (App Router)
 
