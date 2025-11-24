@@ -13,7 +13,7 @@ This tool understands your database schema + question → returns 2–3 optimize
 
 
 ## 🌐 Live Demo
-step1:
+Step1:
 Backend (Render): https://quill-sql-autocomplete.onrender.com/
 
 ⚠️ Render free tier sleeps after inactivity.
