@@ -67,7 +67,8 @@ export default function Home() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/autocomplete", {
+      const res = await fetch("https://quill-sql-autocomplete.onrender.com/autocomplete", {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
