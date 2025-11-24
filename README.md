@@ -1,43 +1,104 @@
-## 🧠 Natural Language SQL Autocomplete
+## SQL Autocomplete AI — Natural Language → SQL Query Suggestions
 
-Convert plain English questions into multiple SQL query options using LLMs (Groq) — with a clean full-stack implementation (FastAPI + Next.js).
+A full-stack AI project that converts natural language questions into SQL queries, powered by LLMs, FastAPI, and Next.js + Tailwind.
 
-## 🚀 Live Demo (optional after deployment)
+This tool understands your database schema + question → returns 2–3 optimized SQL query candidates with descriptions.
 
-Frontend (Vercel): coming soon
 
-Backend (Render/Fly.io): coming soon
 
-## 🏗️ Tech Stack
-Frontend
 
-Next.js 14 (App Router)
 
-TypeScript
 
-Custom CSS (SaaS UI)
+## 🌐 Live Demo
+step1:
+Backend (Render): https://quill-sql-autocomplete.onrender.com/
 
-Beautiful light theme with frosted cards
+⚠️ Render free tier sleeps after inactivity.
+Open the backend URL once to wake it → then use the frontend normally.
 
-Fully responsive
+Step 2 :
+Frontend: [your Vercel URL]https://quill-sql-autocomplete.vercel.app/)
 
-Backend
+## Example Schema and Question 
+SaaS / Subscription App
+
+```
+Table: accounts
+Columns:
+- id (bigint, PK)
+- user_id (bigint)
+- account_type (text)
+
+Table: transactions
+Columns:
+- id (bigint, PK)
+- account_id (bigint, FK to accounts.id)
+- amount (numeric)
+- txn_type (text) -- 'credit' or 'debit'
+- created_at (timestamp)
+```
+Question
+
+```
+How many active users logged in during the last 7 days?
+```
+
+## 🚀 Features
+✔ Natural Language → SQL Conversion
+
+Ask questions like:
+
+“How many users signed up last week?”
+
+“Show the top 3 products by revenue”
+
+“List all orders where amount > 1000”
+
+The system generates:
+
+Multiple SQL query suggestions
+
+Clear human-friendly descriptions
+
+##  Full Stack 
+## Frontend:
+
+Next.js (App Router)
+
+Tailwind CSS
+
+Beautiful card UI
+
+Async loading states
+
+Deployed on Vercel
+
+## Backend:
 
 FastAPI
 
 Python
 
-Groq LLM (Llama-3.1 / 70B)
+Groq Llama-3.3 model
 
-Schema-aware SQL generation
+CORS enabled
 
-Returns 3 SQL query interpretations
+Type-checked Pydantic schemas
 
-## 🔧 Features
+Deployed on Render
 
-✔️ Enter any business question in English
-✔️ Paste a simple schema (LLM-friendly)
-✔️ Get 3 SQL suggestions with different logic
-✔️ Fully copyable SQL blocks
-✔️ Conversation history support internally
-✔️ Clean, minimal UI inspired by modern SaaS apps
+##  System Architecture
+  ````
+       User Input
+            ↓
+   Next.js Frontend (Vercel)
+            ↓  POST /autocomplete
+   FastAPI Backend (Render)
+            ↓
+        Groq LLM
+            ↓
+   SQL Suggestions JSON
+            ↓
+      Frontend Cards UI
+
+````      
