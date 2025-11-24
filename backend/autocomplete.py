@@ -1,7 +1,10 @@
-from models import AutocompleteRequest, AutocompleteResponse
+from models import AutocompleteRequest, QueryOption
 from llm_client import generate_query_options
 
 
-async def autocomplete(request: AutocompleteRequest) -> AutocompleteResponse:
-    options = await generate_query_options(request)
-    return AutocompleteResponse(options=options)
+async def autocomplete(req: AutocompleteRequest) -> list[QueryOption]:
+    """
+    Returns only a list of QueryOption.
+    main.py will wrap it into AutocompleteResponse.
+    """
+    return await generate_query_options(req)

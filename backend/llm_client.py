@@ -9,7 +9,7 @@ from models import AutocompleteRequest, QueryOption, Message
 
 load_dotenv()
 
-api_key = os.environ.get("GROQ_API_KEY") 
+api_key = os.environ.get("GROQ_API_KEY")
 if not api_key:
     raise RuntimeError("GROQ_API_KEY is not set")
 
@@ -22,8 +22,7 @@ def _flatten_message_content(content) -> str:
     if isinstance(content, list):
         parts = []
         for part in content:
-            t = part.get("type")
-            if t == "text" and "text" in part:
+            if part.get("type") == "text" and "text" in part:
                 parts.append(part["text"])
         return "\n".join(parts)
     return ""
@@ -33,37 +32,35 @@ def _build_messages(req: AutocompleteRequest) -> list[dict]:
     system_content = (
         "You are an expert SQL assistant. "
         "Given a database schema, a natural language question, and an optional conversation history, "
-        "you generate 2-3 high quality SQL query suggestions. "
-        "Return a JSON object with an 'options' field that is an array of objects with exactly two fields: "
-        "'description' (short human readable description of the query) and 'sqlQuery' (the SQL string). "
-        "The JSON must look like: "
-        "{ \"options\": [ { \"description\": \"...\", \"sqlQuery\": \"SELECT ...\" }, ... ] } "
-        "Do not include any other fields."
+        "you generate 2–3 high quality SQL query suggestions. "
+        "Return ONLY valid JSON with the structure: "
+        "{ \"options\": [ { \"description\": \"...\", \"sqlQuery\": \"SELECT ...\" }, ... ] }"
     )
-    messages: list[dict] = [
-        {"role": "system", "content": system_content}
-    ]
+
+    messages = [{"role": "system", "content": system_content}]
+
     for m in req.conversationHistory:
-        content_text = _flatten_message_content(m.content)
-        if not content_text:
+        text = _flatten_message_content(m.content)
+        if not text:
             continue
-        role = m.role
-        if role not in ("system", "user", "assistant"):
-            role = "user"
-        messages.append({"role": role, "content": content_text})
-    user_content = (
-        "Here is the database schema:\n"
-        f"{req.schemaDescription}\n\n"
-        "Here is the user's request in natural language:\n"
-        f"{req.userInput}\n\n"
-        "Now output the JSON object with SQL suggestions as specified."
-    )
-    messages.append({"role": "user", "content": user_content})
+        role = m.role if m.role in ("system", "user", "assistant") else "user"
+        messages.append({"role": role, "content": text})
+
+    messages.append({
+        "role": "user",
+        "content": (
+            f"Schema:\n{req.schemaDescription}\n\n"
+            f"User question:\n{req.userInput}\n\n"
+            "Return the JSON now."
+        ),
+    })
+
     return messages
 
 
 async def generate_query_options(req: AutocompleteRequest) -> List[QueryOption]:
     messages = _build_messages(req)
+
     try:
         chat_completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -73,19 +70,27 @@ async def generate_query_options(req: AutocompleteRequest) -> List[QueryOption]:
     except Exception as e:
         print("Error calling LLM:", repr(e))
         return []
+
     content = chat_completion.choices[0].message.content
+
     try:
         data = json.loads(content)
     except json.JSONDecodeError:
-        print("Could not parse JSON from LLM:", content)
+        print("Invalid JSON from LLM:", content)
         return []
+
     raw_options = data.get("options", [])
     options: List[QueryOption] = []
+
     for item in raw_options:
         if not isinstance(item, dict):
             continue
+
         description = item.get("description")
-        sql = item.get("sqlQuery") or item.get("sql_query") or item.get("sql")
-        if description and sql:
-            options.append(QueryOption(description=description, sqlQuery=sql))
+        sql_query = item.get("sqlQuery") or item.get("sql") or item.get("sql_query")
+
+        if description and sql_query:
+            options.append(QueryOption(description=description, sqlQuery=sql_query))
+
+    # return ONLY the list (this is critical)
     return options
