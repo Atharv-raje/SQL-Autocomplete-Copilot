@@ -17,6 +17,10 @@ client = Groq(api_key=api_key)
 
 
 def _flatten_message_content(content) -> str:
+    """
+    We keep this to support any future multi-part messages.
+    Right now your conversationHistory is empty, but this is ready for later.
+    """
     if isinstance(content, str):
         return content
     if isinstance(content, list):
@@ -31,28 +35,27 @@ def _flatten_message_content(content) -> str:
 
 def _build_messages(req: AutocompleteRequest) -> list[dict]:
     system_content = (
-        "You are an autocomplete engine for natural-language analytics questions over SQL data.\n"
-        "The user is typing a question in English about data in a SQL database.\n"
-        "Your job is to AUTOCOMPLETE the unfinished question and also provide a SQL query for each completed question.\n\n"
-        "Requirements:\n"
-        "- You receive a partially typed user question (not a full sentence).\n"
-        "- You must return 2–3 completions that extend this text, as if you were an autocomplete system.\n"
-        "- Each completion must be a full, natural-language question that starts with the original user input and continues it.\n"
-        "- For each completion, also produce a matching SQL query that uses the provided schema.\n\n"
-        "Output JSON format:\n"
+        "You are an expert SQL autocomplete assistant.\n"
+        "The user is typing a natural language question about a SQL schema.\n\n"
+        "You must return JSON ONLY in this exact shape:\n"
         "{\n"
         '  \"options\": [\n'
-        '    { \"completion\": \"full natural language question\", \"sqlQuery\": \"SELECT ...\" },\n'
-        "    ...\n"
+        '    { \"completionText\": \"completed question...\", \"sqlQuery\": \"SELECT ...\" },\n'
+        "    ... up to 3 options\n"
         "  ]\n"
         "}\n\n"
-        "Do not include any other top-level fields. Do not add explanations. Only return JSON."
+        "Rules:\n"
+        "1) completionText MUST be a natural language continuation of the userInput.\n"
+        "   It should feel like autocomplete: take what the user typed and finish the sentence.\n"
+        "2) sqlQuery MUST be a valid SQL query for the given schema.\n"
+        "3) Do not add explanations or any extra fields outside the JSON object.\n"
     )
 
     messages: list[dict] = [
         {"role": "system", "content": system_content}
     ]
 
+    # Include any conversation history (future-proofing)
     for m in req.conversationHistory:
         content_text = _flatten_message_content(m.content)
         if not content_text:
@@ -65,9 +68,9 @@ def _build_messages(req: AutocompleteRequest) -> list[dict]:
     user_content = (
         "Here is the database schema:\n"
         f"{req.schemaDescription}\n\n"
-        "Here is the partially typed user question (autocomplete this):\n"
-        f"{req.userInput}\n\n"
-        "Now return the JSON object as specified."
+        "The user has partially typed this question:\n"
+        f"\"{req.userInput}\"\n\n"
+        "Now output ONLY the JSON object with autocomplete options as specified."
     )
 
     messages.append({"role": "user", "content": user_content})
@@ -76,6 +79,7 @@ def _build_messages(req: AutocompleteRequest) -> list[dict]:
 
 async def generate_query_options(req: AutocompleteRequest) -> List[QueryOption]:
     messages = _build_messages(req)
+
     try:
         chat_completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -100,9 +104,10 @@ async def generate_query_options(req: AutocompleteRequest) -> List[QueryOption]:
     for item in raw_options:
         if not isinstance(item, dict):
             continue
-        completion = item.get("completion") or item.get("completed") or item.get("text")
+        completion = item.get("completionText") or item.get("description")
         sql = item.get("sqlQuery") or item.get("sql_query") or item.get("sql")
         if completion and sql:
-            options.append(QueryOption(completion=completion, sqlQuery=sql))
+            options.append(QueryOption(completionText=completion, sqlQuery=sql))
 
+    # IMPORTANT: return just the list of QueryOption
     return options

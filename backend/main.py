@@ -9,12 +9,14 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# CORS: allow both local dev and deployed frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
-        "https://quill-sql-autocomplete.vercel.app",
-        "*",
+        "http://localhost:3000",                       # local dev
+        "https://quill-sql-autocomplete.vercel.app",  # frontend on Vercel
+        "https://quill-sql-autocomplete.onrender.com",
+        "*",  # keep permissive for the take-home
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -30,4 +32,5 @@ def health_check():
 @app.post("/autocomplete", response_model=AutocompleteResponse)
 async def autocomplete_endpoint(req: AutocompleteRequest):
     options = await autocomplete_service(req)
+    # Wrap the list in the response model
     return AutocompleteResponse(options=options)

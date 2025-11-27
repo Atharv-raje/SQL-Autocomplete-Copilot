@@ -1,24 +1,24 @@
-from typing import List, Optional, Union
-
+from typing import List, Literal, Any
 from pydantic import BaseModel
 
 
 class Message(BaseModel):
-    id: Optional[str] = None
-    role: str
-    content: Union[str, List[dict]]
-    name: Optional[str] = None
-
-
-class QueryOption(BaseModel):
-    completion: str
-    sqlQuery: str
+    role: Literal["system", "user", "assistant"]
+    # We keep this flexible so we can pass through whatever the LLM might send
+    content: Any
 
 
 class AutocompleteRequest(BaseModel):
     userInput: str
-    conversationHistory: List[Message]
     schemaDescription: str
+    conversationHistory: List[Message] = []
+
+
+class QueryOption(BaseModel):
+    # Completed natural-language question to show in dropdown / card
+    completionText: str
+    # Final SQL query
+    sqlQuery: str
 
 
 class AutocompleteResponse(BaseModel):
