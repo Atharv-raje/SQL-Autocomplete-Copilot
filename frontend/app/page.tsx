@@ -45,13 +45,12 @@ Columns:
         });
 
         if (!res.ok) {
-          // If backend fails, hide dropdown silently
           setShowInline(false);
           return;
         }
 
         const data = await res.json();
-        const raw = Array.isArray(data.options) ? data.options : [];
+        const raw: any[] = Array.isArray(data.options) ? data.options : [];
 
         const suggestions: string[] = raw
           .map((opt: any) =>
@@ -61,7 +60,7 @@ Columns:
                 ""
             ).trim()
           )
-          .filter((s) => s.length > 0)
+          .filter((s: string) => s.length > 0)
           .slice(0, 5);
 
         setInlineSuggestions(suggestions);
@@ -81,7 +80,6 @@ Columns:
     setUserInput(value);
     setError("");
 
-    // reset dropdown when input is too short
     if (!value.trim() || value.trim().length < 3) {
       setInlineSuggestions([]);
       setShowInline(false);
@@ -91,7 +89,6 @@ Columns:
       return;
     }
 
-    // debounce backend calls a little
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
@@ -141,7 +138,9 @@ Columns:
       }
 
       const data = await res.json();
-      const sqlOptions = Array.isArray(data.options) ? data.options : [];
+      const sqlOptions: any[] = Array.isArray(data.options)
+        ? data.options
+        : [];
 
       const normalized: QueryOption[] = sqlOptions
         .map((opt: any) => ({
@@ -154,7 +153,7 @@ Columns:
             opt.sqlQuery ?? opt.sql_query ?? opt.sql ?? ""
           ),
         }))
-        .filter((o) => o.completionText && o.sqlQuery);
+        .filter((o: QueryOption) => o.completionText && o.sqlQuery);
 
       // show ONLY the top option as the final SQL
       setOptions(normalized.slice(0, 1));
