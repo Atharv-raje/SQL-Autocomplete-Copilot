@@ -207,6 +207,8 @@ body {
 }
 
 .resultsGrid {
+  width : 100%;
+  margin-top: 20%;
   display: flex;
   justify-content: center;
   margin-top: 10px;
