@@ -1,4 +1,4 @@
-[## SQL Autocomplete AI — Natural Language Autocomplete → SQL Generator
+## SQL Autocomplete AI — Natural Language Autocomplete → SQL Generator
 
 A full-stack AI system that provides real-time natural-language autocomplete and generates precise SQL queries.
 
