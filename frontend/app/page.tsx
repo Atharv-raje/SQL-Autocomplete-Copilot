@@ -30,7 +30,7 @@ Columns:
     process.env.NEXT_PUBLIC_BACKEND_URL ??
     "https://quill-sql-autocomplete.onrender.com/autocomplete";
 
-  // ---------------- INLINE AUTOCOMPLETE (DROPDOWN) ----------------
+  // ------------ inline autocomplete (dropdown) ------------
   const fetchInlineSuggestions = useCallback(
     async (partial: string) => {
       try {
@@ -105,7 +105,7 @@ Columns:
     await submit(undefined, suggestion);
   };
 
-  // ---------------- MAIN SUBMIT (FINAL SQL) ----------------
+  // ------------ main submit (final SQL) ------------
   const submit = async (
     e?: React.FormEvent,
     overrideQuestion?: string
@@ -155,7 +155,7 @@ Columns:
         }))
         .filter((o: QueryOption) => o.completionText && o.sqlQuery);
 
-      // show ONLY the top option as the final SQL
+      // show ONLY top option as final SQL card
       setOptions(normalized.slice(0, 1));
     } catch (err) {
       console.error(err);
@@ -196,7 +196,7 @@ Columns:
                 <textarea
                   className="input"
                   rows={2}
-                  placeholder="Example: total amount of all debit transactions..."
+                  placeholder="Example: total sum of all debit transactions today..."
                   value={userInput}
                   onChange={handleUserInputChange}
                 />
@@ -216,7 +216,7 @@ Columns:
               </div>
             </div>
 
-            {/* Schema */}
+            {/* Schema textarea */}
             <div className="field">
               <label className="label">Schema description</label>
               <textarea
@@ -245,6 +245,7 @@ Columns:
               or press the button to generate one.
             </p>
           )}
+
           <div className="resultsGrid">
             {options.map((opt, index) => (
               <div key={index} className="card">
