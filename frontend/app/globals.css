@@ -89,7 +89,7 @@ body {
   color: #111827;
 }
 
-/* --- Textareas --- */
+/* --- Textareas / inputs --- */
 
 .input {
   width: 100%;
@@ -112,7 +112,7 @@ body {
   background: #fefeff;
 }
 
-/* --- Autocomplete dropdown --- */
+/* --- Autocomplete dropdown under the question box --- */
 
 .autocompleteWrapper {
   position: relative;
@@ -221,7 +221,7 @@ body {
   justify-content: center;
 }
 
-/* BIGGER hero SQL card */
+/* BIG hero SQL card (full width) */
 .card {
   width: 100%;
   max-width: 100%;
@@ -260,7 +260,7 @@ body {
   color: #111827;
 }
 
-/* scrollable SQL */
+/* scrollable SQL block */
 .codeBlock {
   margin: 6px 0 0;
   padding: 10px 12px;
@@ -313,7 +313,7 @@ body {
   filter: brightness(1.02);
 }
 
-/* --- Footer spacing / responsive --- */
+/* --- Responsive tweaks --- */
 
 @media (max-width: 768px) {
   .panel {
