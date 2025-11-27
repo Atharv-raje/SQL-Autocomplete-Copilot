@@ -256,11 +256,19 @@ body {
 
 /* scrollable SQL block */
 .codeBlock {
-  width: 100%;              /* Take full width */
-  display: block;
+  margin: 6px 0 0;
+  padding: 10px 12px;
+  background: #020617;
+  color: #e5e7eb;
+  border-radius: 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.92rem;
+  line-height: 1.6;
   overflow-x: auto;
+  white-space: pre;
+  width: 100%;
 }
-
 
 /* thin scroll bar for SQL block */
 .codeBlock::-webkit-scrollbar {
